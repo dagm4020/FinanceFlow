@@ -1,0 +1,43 @@
+{
+  "name": "financeflow-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "cross-env NODE_ENV=development nodemon server.js",
+    "serve": "cross-env NODE_ENV=production pm2 start server.js --name server --interpreter node"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.7.7",
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "dotenv-flow": "^4.1.0",
+    "express": "^4.21.1",
+    "express-rate-limit": "^7.4.1",
+    "handlebars": "^4.7.8",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.11.3",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.9.16",
+    "open": "^10.1.0",
+    "openai": "^3.3.0",
+    "plaid": "^29.0.0",
+    "react-flip-numbers": "^3.0.8",
+    "react-plaid-link": "^3.6.1",
+    "react-toastify": "^10.0.6",
+    "react-transition-group": "^4.4.5",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "nodemon": "^3.1.10"
+  }
+}
