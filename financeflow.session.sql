@@ -1,1 +1,0 @@
-select * from Challenges where userID = 41;

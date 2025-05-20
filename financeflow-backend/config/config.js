@@ -1,5 +1,7 @@
-// config/config.js
-require('dotenv-flow').config();
+// Only use dotenv-flow in local development (not in Docker)
+if (process.env.NODE_ENV !== 'production' && process.env.IN_DOCKER !== 'true') {
+  require('dotenv-flow').config();
+}
 
 const requiredEnvVars = [
   'OPENAI_API_KEY',
@@ -14,6 +16,7 @@ const requiredEnvVars = [
   // Add other database env variables if required
 ];
 
+// Verify that all required environment variables are set
 requiredEnvVars.forEach((varName) => {
   if (!process.env[varName]) {
     console.error(`Error: Missing environment variable ${varName}`);

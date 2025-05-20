@@ -1,9 +1,12 @@
-// server.js
+// Only use dotenv-flow in local development (not in Docker)
+if (process.env.NODE_ENV !== 'production' && process.env.IN_DOCKER !== 'true') {
+  require('dotenv-flow').config();
+}
+
 const express = require('express');
 const app = express();
 const cors = require('cors');
 const morgan = require('morgan'); // HTTP request logger
-require('dotenv-flow').config();
 const cron = require('node-cron');
 const plaidController = require('./controllers/plaidController');
 const config = require('./config/config'); // Importing config
@@ -13,7 +16,6 @@ const challengeRoutes = require('./routes/challengeRoutes');
 // Debug logs
 console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
 console.log(`FRONTEND_BASE_URL: ${process.env.FRONTEND_BASE_URL}`);
-console.log('Server running on port', config.port);
 
 // Import Routes
 const userRoutes = require('./routes/userRoutes');
@@ -28,14 +30,13 @@ const errorHandler = require('./middleware/errorHandler'); // Centralized error 
 
 // Middleware Configuration
 const allowedOrigins = [
-  'http://localhost:3000',
+  process.env.FRONTEND_BASE_URL || 'http://localhost:3000',
   'http://financeflow.icu',
   'https://financeflow.icu'
 ];
 
 app.use(cors({
   origin: (origin, callback) => {
-    // allow requests with no origin (like mobile apps, curl, etc.)
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
@@ -45,16 +46,17 @@ app.use(cors({
   },
   credentials: true,
 }));
+
 app.use(express.json());
 app.use(morgan('dev')); // Logs all incoming requests in the 'dev' format
 
 // Routes Configuration
 app.use('/api/users', userRoutes);
-app.use('/api/plaid', plaidRoutes); // plaidRoutes already include authenticate middleware
-app.use('/api/expenses', expenseRoutes); // expenseRoutes already include authenticate middleware
-app.use('/api/ai-insights', aiInsightsRoutes); // aiInsightsRoutes already include authenticate middleware
-app.use('/api/categories', categoryRoutes); // categoryRoutes already include authenticate middleware
-app.use('/api/notifications', notificationRoutes); // notificationRoutes already include authenticate middleware
+app.use('/api/plaid', plaidRoutes);
+app.use('/api/expenses', expenseRoutes);
+app.use('/api/ai-insights', aiInsightsRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/notifications', notificationRoutes);
 app.use('/api/budgets', budgetRoutes);
 app.use('/api/challenges', challengeRoutes);
 
@@ -66,16 +68,14 @@ app.use((req, res, next) => {
 // Centralized Error Handler
 app.use(errorHandler);
 
-//Health check 
+// Health check 
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'OK' });
 });
 
-
 // Start the Server
-const PORT = config.port || 5005;
+const PORT = process.env.PORT || 5005;
 app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
-
 
 // Schedule the task to run daily at midnight
 cron.schedule('0 0 * * *', async () => {

@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./financeflow-backend
+      dockerfile: Dockerfile
+    ports:
+      - "5005:5005"
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - IN_DOCKER=true  # This will ensure dotenv-flow is ignored in Docker
+      - DB_HOST=${DB_HOST}
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - PLAID_CLIENT_ID=${PLAID_CLIENT_ID}
+      - PLAID_SECRET=${PLAID_SECRET}
+      - PLAID_ENV=${PLAID_ENV}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASS=${EMAIL_PASS}
+      - FRONTEND_BASE_URL=${FRONTEND_BASE_URL:-http://localhost:3000}
+      - PORT=5005
+    command: >
+      sh -c "
+      echo 'Running in ${NODE_ENV} mode';
+      echo 'API Base URL: ${REACT_APP_API_BASE_URL}';
+      node server.js
+      "
+    restart: always
+    networks:
+      - financeflow-network
+
+  frontend:
+    build:
+      context: ./financeflow-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL:-http://localhost:5005}
+    restart: always
+    networks:
+      - financeflow-network
+
+networks:
+  financeflow-network:
